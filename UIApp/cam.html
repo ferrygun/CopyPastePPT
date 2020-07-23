@@ -1,0 +1,125 @@
+<html>
+  <head>
+  </head>
+  <body onload="init();">
+    <h2 style="
+    border-width: 1px;
+    border-color: #cccccc;
+    font-family: &quot;72-Web&quot;,Arial,Helvetica,sans-serif;
+    font-weight: bold;
+    color: #333333;
+    height: 2rem;
+    line-height: 3rem;
+    color: #666666;
+    text-shadow: 0 1px rgba(255,255,255,0.5);
+">Take picture from webcam</h2>
+     <p>
+    	<button onclick="startWebcam();" style="
+		    background-image: none;
+		    background-color: #5496cd;
+		    border-color: #418ac7;
+		    color: #ffffff;
+		    text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+		    border: 1px solid #ababab;
+		    border-radius: 0.2rem;
+		    line-height: 2rem;
+		">Start WebCam</button>
+       <button onclick="snapshot();" style="
+		    background-image: none;
+		    background-color: #5496cd;
+		    border-color: #418ac7;
+		    color: #ffffff;
+		    text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+		    border: 1px solid #ababab;
+		    border-radius: 0.2rem;
+		    line-height: 2rem;
+		">Take picture</button>
+	</p>
+	<table width="100%">	
+		<tr>
+			<td width="50%">
+				<video onclick="snapshot(this);" width=480 height=360 id="video" controls autoplay></video>
+			</td>	
+			<td width="50%">
+				<p> Screenshots : </p>
+				<canvas  id="myCanvas" width="640" height="480"></canvas>  
+			</td>	
+		</tr>  
+	 </table> 
+  </body>
+  <script>
+      //--------------------
+      // GET USER MEDIA CODE chrome.exe --unsafely-treat-insecure-origin-as-secure=http://<hosted url> --test-type --user-data-dir=c:\temp\
+      //--------------------
+          navigator.getUserMedia = ( navigator.getUserMedia ||
+                             navigator.webkitGetUserMedia ||
+                             navigator.mozGetUserMedia ||
+                             navigator.msGetUserMedia);
+
+      var video;
+      var webcamStream;
+
+      function startWebcam() {
+        if (navigator.getUserMedia) {
+           navigator.getUserMedia (
+
+              // constraints
+              {
+                 video: true,
+                 audio: false
+              },
+
+              // successCallback
+              function(localMediaStream) {
+                  video = document.querySelector('video');
+                 video.src = window.URL.createObjectURL(localMediaStream);
+                 webcamStream = localMediaStream;
+              },
+
+              // errorCallback
+              function(err) {
+                 console.log("The following error occured: " + err);
+              }
+           );
+        } else {
+           console.log("getUserMedia not supported");
+        }  
+      }
+
+      function stopWebcam() {
+          webcamStream.stop();
+      }
+      //---------------------
+      // TAKE A SNAPSHOT CODE
+      //---------------------
+      var canvas, ctx;
+
+      function init() {
+        // Get the canvas and obtain a context for
+        // drawing in it
+        canvas = document.getElementById("myCanvas");
+        ctx = canvas.getContext('2d');
+      }
+
+      function snapshot() {
+      	let image = new Image();
+	    //let canv = this.canvas.get(0)
+	    //var context = canv.getContext('2d');
+         // Draws current image from the video element into the canvas
+        ctx.drawImage(video, 0,0, canvas.width, canvas.height);
+        var data =	canvas.toDataURL('image/jpeg');
+        //var post_bin = data.replace("data:image/jpeg;base64,", "");
+    	image.src = data;
+    	window.filebinary = data;
+    	//alert("Picture taken and downloaded");
+    	//var url = image.src.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+    	//location.href = url;
+    	
+    	var link = document.createElement('a');
+	    link.download = "Webcam_image.jpg";
+	    link.href = image.src;
+	    link.click();
+      }
+
+  </script>
+</html>
